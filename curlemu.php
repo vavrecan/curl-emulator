@@ -17,6 +17,7 @@ if (!function_exists('curl_init')) {
     define ('CURLOPT_CONNECTTIMEOUT', 78);
     define ('CURLOPT_TIMEOUT', 13);
     define ('CURLOPT_CAINFO', 10065);
+    define ('CURLOPT_SSLVERSION', 32);
 
     // curl info constants
     define ('CURLINFO_HEADER_SIZE', 2097163);
