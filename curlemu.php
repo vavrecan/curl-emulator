@@ -21,6 +21,8 @@ if (!function_exists('curl_init')) {
     define ('CURLOPT_FOLLOWLOCATION', 52);
     define ('CURLOPT_FORBID_REUSE', 75);
     define ('CURLOPT_HTTP_VERSION', 84);
+    define ('CURLOPT_MAXREDIRS', 68);
+    define ('CURLOPT_ENCODING', 10102);
 
     // curl info constants
     define ('CURLINFO_HEADER_SIZE', 2097163);
@@ -66,23 +68,45 @@ if (!function_exists('curl_init')) {
                 $this->fetchResult();
             }
 
-            if ($opt == CURLINFO_HEADER_SIZE) {
-                // Calculate header size
-                $responseSize = 0;
-                foreach ($this->responseHeader as $header) {
-                    $responseSize += (strlen($header) + 1); // The one is for each newline
-                }
-                return $responseSize;
-            }
-            if ($opt == CURLINFO_HTTP_CODE) {
-                // Return the header status code
-                $matches = array();
-                preg_match('#HTTP/\d+\.\d+ (\d+)#', $this->responseHeader[0], $matches);
-                return intval($matches[1]);
-            } else {
-                throw new \Exception("No support in Curl wrapper for: " . $opt);
-            }
+            $responseHeaderSize = 0;
+            foreach ($this->responseHeader as $header)
+                $responseHeaderSize += (strlen($header) + 2); // The one is for each newline
 
+            $httpCode = 200;
+            if (preg_match('#HTTP/\d+\.\d+ (\d+)#', $this->responseHeader[0], $matches))
+                $httpCode = intval($matches[1]);
+
+            // opt
+            if ($opt == CURLINFO_HEADER_SIZE)
+                return $responseHeaderSize;
+
+            if ($opt == CURLINFO_HTTP_CODE)
+                return $httpCode;
+
+            return [
+                "url" => $this->url,
+                "content_type" => "",
+                "http_code" => $httpCode,
+                "header_size" => $responseHeaderSize,
+                "request_size" => 0,
+                "filetime" => 0,
+                "ssl_verify_result" => null,
+                "redirect_count" => 0,
+                "total_time" => 0,
+                "namelookup_time" => 0,
+                "connect_time" => 0,
+                "pretransfer_time" => 0,
+                "size_upload" => 0,
+                "size_download" => 0,
+                "speed_download" => 0,
+                "speed_upload" => 0,
+                "download_content_length" => 0,
+                "upload_content_length" => 0,
+                "starttransfer_time" => 0,
+                "redirect_time" => 0,
+                "certinfo" => 0,
+                "request_header" => 0
+            ];
         }
 
         public function exec()
@@ -92,8 +116,8 @@ if (!function_exists('curl_init')) {
             $fullResult = $this->result;
 
             if ($this->getValue(CURLOPT_HEADER, false)) {
-                $headers = implode("\n", $this->responseHeader);
-                $fullResult = $headers . "\n" . $this->result;
+                $headers = implode("\r\n", $this->responseHeader);
+                $fullResult = $headers . "\r\n" . $this->result;
             }
 
             if ($this->getValue(CURLOPT_RETURNTRANSFER, false) == false) {
