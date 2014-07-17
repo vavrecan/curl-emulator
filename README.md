@@ -1,4 +1,4 @@
-curl-emulator
+Curl Emulator
 =============
 
 Curl Request Emulator
