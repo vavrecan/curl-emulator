@@ -222,9 +222,9 @@ if (!function_exists('curl_init')) {
         return $ch->exec();
     }
 
-    function curl_getinfo($ch, $opt = 0)
+    function curl_getinfo($ch, $option = 0)
     {
-        return $ch->getInfo($opt);
+        return $ch->getInfo($option);
     }
 
     function curl_errno($ch) {
@@ -237,5 +237,11 @@ if (!function_exists('curl_init')) {
 
     function curl_close($ch) {
         return $ch->close();
+    }
+
+    function curl_setopt_array($ch, $options) {
+        foreach ($options as $option => $value) {
+            curl_setopt($ch, $option, $value);
+        }
     }
 }
