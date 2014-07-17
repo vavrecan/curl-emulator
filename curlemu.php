@@ -85,10 +85,12 @@ if (!function_exists('curl_init')) {
         {
             $this->fetchResult();
 
-            // Curl normally returns the headers with the content, so that is what we are doing here
-            $headers = implode("\n", $this->responseHeader);
+            $fullResult = $this->result;
 
-            $fullResult = $headers . "\n" . $this->result;
+            if ($this->getValue(CURLOPT_HEADER, false)) {
+                $headers = implode("\n", $this->responseHeader);
+                $fullResult = $headers . "\n" . $this->result;
+            }
 
             if ($this->getValue(CURLOPT_RETURNTRANSFER, false) == false) {
                 print $fullResult;
@@ -173,12 +175,7 @@ if (!function_exists('curl_init')) {
 //			}
 
             $context = stream_context_create($options);
-
-            try {
-                $this->result = file_get_contents($this->url, false, $context);
-            } catch (\exception $e) {
-                $this->result = null;
-            }
+            $this->result = file_get_contents($this->url, false, $context);
 
             $this->responseHeader = $http_response_header;
         }
