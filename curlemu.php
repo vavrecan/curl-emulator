@@ -18,6 +18,7 @@ if (!function_exists('curl_init')) {
     define ('CURLOPT_TIMEOUT', 13);
     define ('CURLOPT_CAINFO', 10065);
     define ('CURLOPT_SSLVERSION', 32);
+    define ('CURLOPT_FOLLOWLOCATION', 52);
 
     // curl info constants
     define ('CURLINFO_HEADER_SIZE', 2097163);
@@ -160,6 +161,8 @@ if (!function_exists('curl_init')) {
                     'content' => $content
                 )
             );
+
+            $options["http"]["follow_location"] = $this->getValue(CURLOPT_FOLLOWLOCATION, 1);
 
             // get url from options
             if ($this->getValue(CURLOPT_URL, false))
